@@ -1,0 +1,189 @@
+= Méthodologie Bug Bounty — Fiche de suivi
+:toc:
+:toclevels: 2
+:sectnums:
+
+Document à remplir au fil d'un engagement de bug bounty — une copie par programme/cible.
+
+== 1. Informations générales
+
+[cols="1,3", options="header"]
+|===
+| Champ | Valeur
+
+| Nom du programme
+|
+
+| Plateforme
+| (HackerOne / Bugcrowd / Intigriti / YesWeHack / autre)
+
+| Type de programme
+| (Public / Privé / VDP)
+
+| URL / assets en scope
+|
+
+| Date de début des tests
+|
+
+| Testeur
+|
+
+| Type de récompense
+| (Bounty monétaire / points / CVE / swag)
+|===
+
+== 2. Scope et règles d'engagement
+
+[cols="1,3", options="header"]
+|===
+| Champ | Valeur
+
+| Domaines / IP inclus
+|
+
+| Domaines / IP exclus
+|
+
+| Tests autorisés
+|
+
+| Tests interdits
+| (DoS, social engineering, spam, tests physiques...)
+
+| Contact / canal
+|
+
+| Politique de divulgation
+|
+|===
+
+== 3. Reconnaissance passive
+
+* [ ] Whois / informations d'enregistrement
+* [ ] Certificate Transparency (crt.sh, censys)
+* [ ] Énumération de sous-domaines (subfinder, amass, assetfinder)
+* [ ] Google dorking
+* [ ] Recherche GitHub / GitLab (secrets, repos liés)
+* [ ] Shodan / Censys (services exposés)
+* [ ] Wayback Machine / archive.org
+* [ ] Offres d'emploi / réseaux sociaux (stack technique)
+
+TIP: Ajouter les résultats de chaque point directement sous la case correspondante.
+
+== 4. Reconnaissance active
+
+* [ ] Résolution DNS des sous-domaines (httpx, dnsx)
+* [ ] Scan de ports (nmap, masscan)
+* [ ] Fingerprinting technologique (Wappalyzer, whatweb)
+* [ ] Screenshots de masse (aquatone, gowitness)
+* [ ] Crawl du site (Burp Spider, katana)
+* [ ] Découverte de contenu caché (ffuf, gobuster, dirsearch)
+* [ ] Fichiers sensibles (.git, .env, sauvegardes)
+* [ ] Découverte d'API (Swagger/OpenAPI, introspection GraphQL)
+
+== 5. Cartographie de l'application
+
+[cols="1,3", options="header"]
+|===
+| Champ | Valeur
+
+| Fonctionnalités principales
+|
+
+| Rôles utilisateurs identifiés
+|
+
+| Mécanisme d'authentification
+|
+
+| Endpoints API recensés
+|
+
+| Technologies back/front
+|
+|===
+
+== 6. Tests par catégorie de vulnérabilité
+
+[cols="3,1,2,3", options="header"]
+|===
+| Catégorie | Testé | Résultat | Notes
+
+| Injection SQL / NoSQL | [ ] | |
+| XSS (réfléchie / stockée / DOM) | [ ] | |
+| Contrôle d'accès (IDOR, élévation de privilèges) | [ ] | |
+| Authentification (brute force, reset password, 2FA bypass) | [ ] | |
+| CSRF | [ ] | |
+| SSRF | [ ] | |
+| XXE | [ ] | |
+| Désérialisation | [ ] | |
+| Upload de fichiers | [ ] | |
+| Logique métier (race conditions, contournement de workflow) | [ ] | |
+| Configuration de sécurité (en-têtes, CORS, secrets exposés) | [ ] | |
+| Rate limiting / abus d'API | [ ] | |
+| Autre (à préciser) | [ ] | |
+|===
+
+== 7. Journal des découvertes
+
+[cols="1,2,2,1,1", options="header"]
+|===
+| Date | Endpoint / fonctionnalité | Vulnérabilité suspectée | Sévérité | Statut
+
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+| | | | |
+|===
+
+== 8. Fiche de rapport de vulnérabilité
+
+NOTE: À dupliquer pour chaque vulnérabilité soumise au programme.
+
+[cols="1,3", options="header"]
+|===
+| Champ | Valeur
+
+| Titre
+|
+
+| Catégorie (CWE)
+|
+
+| URL / endpoint concerné
+|
+
+| Résumé
+|
+
+| Étapes de reproduction
+a|
+.
+.
+.
+
+| Preuve de concept
+| (requête HTTP, capture d'écran, vidéo)
+
+| Impact
+|
+
+| Sévérité (CVSS)
+|
+
+| Recommandation de correction
+|
+|===
+
+== 9. Soumission et suivi
+
+[cols="1,2,1,3", options="header"]
+|===
+| Date soumission | Statut | Récompense | Commentaires
+
+| | (Triage / Accepté / Doublon / Non applicable / Corrigé) | |
+| | | |
+| | | |
+|===
