@@ -13,6 +13,7 @@ Documentation pratique sur Burp Suite pour les tests d'intrusion web, avec des t
 - [05 - Intruder](05-intruder.md)
 - [06 - Scanner (Burp Pro)](06-scanner.md)
 - [07 - Extensions (BApp Store)](07-extensions.md)
+- [08 - Wordlists ciblées & brute-force d'une API](08-wordlists-brute-force-api.md)
 - [TP récapitulatif](tp-recapitulatif.md)
 
 ## Environnement de lab recommandé
