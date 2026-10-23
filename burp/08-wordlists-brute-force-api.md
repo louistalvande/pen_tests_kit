@@ -177,7 +177,7 @@ MAXWORDS=3 NUMMAX=2 SPECMAX=1 bash tools/genpass.sh wordlists/ma-cible
 | Variable | Rôle | Défaut |
 |---|---|---|
 | `MAXWORDS` | nb max de mots collés (1 à 3) | 1 |
-| `NUMMAX` | nb max de nombres ajoutés (0–2) | 1 |
+| `NUMMAX` | nb max de nombres ajoutés (0–3) | 1 |
 | `SPECMAX` | nb max de spéciaux ajoutés (0–2) | 1 |
 | `MINLEN` | longueur minimale conservée | 8 |
 | `MAXLEN` | longueur maximale conservée | 18 |

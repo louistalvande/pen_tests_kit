@@ -7,7 +7,7 @@
 # Combine, pour chaque mot (ou paire de mots) : casse + 0..NUMMAX nombres + 0..SPECMAX spéciaux.
 # Réglages (variables d'env) :
 #   MAXWORDS=1|2   nb max de mots-tokens collés          (défaut 1)
-#   NUMMAX=0|1|2   nb max de nombres ajoutés             (défaut 1)
+#   NUMMAX=0..3    nb max de nombres ajoutés             (défaut 1)
 #   SPECMAX=0|1|2  nb max de spéciaux ajoutés            (défaut 1)
 #   MINLEN=N       longueur minimale conservée           (défaut 8)
 #   MAXLEN=N       longueur maximale conservée           (défaut 18)
@@ -72,10 +72,11 @@ gen() {
   BEGIN{
     while((getline x < "numbers.txt")>0) if(x!="") NUM[++nn]=x
     while((getline x < "specials.txt")>0) if(x!="") SP[++ns]=x
-    # combos de nombres : index 0 = "" ; puis simples ; puis paires si NUMMAX>=2
+    # combos de nombres : index 0 = "" ; simples ; paires (NUMMAX>=2) ; triplets (NUMMAX>=3)
     NC[nc++]="";
     if(NUMMAX>=1) for(i=1;i<=nn;i++) NC[nc++]=NUM[i]
     if(NUMMAX>=2) for(i=1;i<=nn;i++) for(j=1;j<=nn;j++) NC[nc++]=NUM[i] NUM[j]
+    if(NUMMAX>=3) for(i=1;i<=nn;i++) for(j=1;j<=nn;j++) for(k=1;k<=nn;k++) NC[nc++]=NUM[i] NUM[j] NUM[k]
     # combos de spéciaux
     SCn[sc++]="";
     if(SPECMAX>=1) for(i=1;i<=ns;i++) SCn[sc++]=SP[i]
