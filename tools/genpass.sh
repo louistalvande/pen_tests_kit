@@ -106,12 +106,16 @@ gen() {
           }
         }
       }
-      # un nombre de CHAQUE côté du mot — besoin de NUMMAX>=2
+      # nombres répartis AVANT et APRÈS le mot (total <= NUMMAX) — besoin de NUMMAX>=2
       if(NUMMAX>=2) for(p=1;p<=nn;p++) for(q=1;q<=nn;q++){
-        emit(NUM[p] b NUM[q])             # 2026cours27
+        emit(NUM[p] b NUM[q])             # 1 avant / 1 après : 2026cours27
         if(SPECMAX>=1) for(k=1;k<=ns;k++){
           emit(NUM[p] b NUM[q] SP[k])     # 2026cours27!
           emit(SP[k] NUM[p] b NUM[q])     # !2026cours27
+        }
+        if(NUMMAX>=3) for(r=1;r<=nn;r++){
+          emit(NUM[p] b NUM[q] NUM[r])    # 1 avant / 2 après : 2026cours20272027
+          emit(NUM[p] NUM[q] b NUM[r])    # 2 avant / 1 après : 20262027cours2027
         }
       }
     }
