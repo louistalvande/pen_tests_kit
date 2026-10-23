@@ -34,6 +34,7 @@ done
 #    combinaisons de mots : jp, sjp, csjp, cjp…) + concaténations de 1..MAXWORDS mots.
 #    Les lignes multi-mots de words.txt sont éclatées en mots individuels.
 awk -v MAXWORDS="$MAXWORDS" '
+BEGIN{ while((getline x < "numbers.txt")>0) if(x ~ /^[0-9]+$/) NB[++bn]=x }
 { for(i=1;i<=NF;i++) G[++M]=$i }                 # séquence globale de mots
 END{
   # mots simples + troncatures (4 et 5 premières lettres)
@@ -53,10 +54,13 @@ END{
       a=""; for(k=0;k<len;k++) a=a substr(G[s+k],1,1); print a }
   }
   # concaténations ordonnées de mots DISTINCTS, longueur 2..MAXWORDS (+ séparateurs)
+  # + nombre INSÉRÉ ENTRE les mots (cours2026jean), les nombres venant de numbers.txt
   if(MAXWORDS>=2) for(i=1;i<=M;i++) for(j=1;j<=M;j++){ if(i==j) continue;
     print G[i] G[j]; print G[i]"-"G[j]; print G[i]"."G[j];
+    for(t=1;t<=bn;t++){ print G[i] NB[t] G[j]; print G[i]"-"NB[t]"-"G[j] }
     if(MAXWORDS>=3) for(k=1;k<=M;k++){ if(k==i||k==j) continue;
-      print G[i] G[j] G[k]; print G[i]"-"G[j]"-"G[k]; print G[i]"."G[j]"."G[k]; }
+      print G[i] G[j] G[k]; print G[i]"-"G[j]"-"G[k]; print G[i]"."G[j]"."G[k];
+      for(t=1;t<=bn;t++){ print G[i] NB[t] G[j] G[k]; print G[i] G[j] NB[t] G[k] } }
   }
 }' words.txt | { grep -v ' ' || true; } | sed '/^[[:space:]]*$/d' | sort -u > .base.txt
 NB=$(wc -l < .base.txt)
@@ -99,6 +103,14 @@ gen() {
             emit(SP[p] b n SP[q])         # !cours2026@
             emit(SP[p] n b SP[q])         # !2026cours@
           }
+        }
+      }
+      # un nombre de CHAQUE côté du mot — besoin de NUMMAX>=2
+      if(NUMMAX>=2) for(p=1;p<=nn;p++) for(q=1;q<=nn;q++){
+        emit(NUM[p] b NUM[q])             # 2026cours27
+        if(SPECMAX>=1) for(k=1;k<=ns;k++){
+          emit(NUM[p] b NUM[q] SP[k])     # 2026cours27!
+          emit(SP[k] NUM[p] b NUM[q])     # !2026cours27
         }
       }
     }
