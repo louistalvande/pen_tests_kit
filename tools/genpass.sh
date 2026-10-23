@@ -83,10 +83,22 @@ gen() {
     for(ci=1;ci<=3;ci++){ b=CF[ci]
       for(ni=0;ni<nc;ni++){ n=NC[ni]
         for(si=0;si<sc;si++){ s=SCn[si]
-          emit(b n s)                 # mot + nombre + spécial      (cours2026!)
-          if(s!="") emit(s b n)       # spécial + mot + nombre      (!cours2026)
-          if(n!="") emit(n b s)       # nombre + mot + spécial      (2026cours!)
-          if(n!="" && s!="") emit(s n b)  # spécial + nombre + mot  (!2026cours)
+          emit(b n s)                     # mot + nombre + spécial   (cours2026!)
+          if(s!="") emit(s b n)           # spécial + mot + nombre   (!cours2026)
+          if(n!="") emit(n b s)           # nombre + mot + spécial   (2026cours!)
+          if(n!="" && s!=""){
+            emit(s n b)                   # spécial + nombre + mot   (!2026cours)
+            emit(n s b)                   # nombre + spécial + mot   (2026!cours)
+            emit(b s n)                   # mot + spécial + nombre   (cours!2026)
+          }
+        }
+        # un spécial (éventuellement différent) à CHAQUE bout — besoin de SPECMAX>=2
+        if(SPECMAX>=2) for(p=1;p<=ns;p++) for(q=1;q<=ns;q++){
+          emit(SP[p] b SP[q])             # !cours@
+          if(n!=""){
+            emit(SP[p] b n SP[q])         # !cours2026@
+            emit(SP[p] n b SP[q])         # !2026cours@
+          }
         }
       }
     }
