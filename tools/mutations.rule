@@ -1,8 +1,0 @@
-# mutations.rule — règles de mutation hashcat (syntaxe hashcat)
-# Usage : hashcat --stdout base.txt -r tools/mutations.rule > mutated.txt
-# Voir burp/08-wordlists-brute-force-api.md §1.4
-c $2 $0 $2 $5          # Capitalize + "2025"
-c $2 $0 $2 $6          # Capitalize + "2026"
-c $!
-c $@ $1 $2 $3
-sa@ se3 so0 c $!       # leet + capitalize + "!"
