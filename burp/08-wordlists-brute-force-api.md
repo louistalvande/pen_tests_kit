@@ -54,7 +54,7 @@ Les transformations à produire systématiquement, à partir de chaque mot/expre
 | Casse | `AnonShop`, `ANON`, `AnonymousShop` |
 | Synonymes de domaine | `shop` → `store`, `eshop`, `boutique`, `market` |
 
-Ces dérivations sont **générées automatiquement** par [`tools/genpass.sh`](../tools/genpass.sh) (cf §1.7) à partir des mots de `words.txt` : troncatures, concaténations (collé / tiret / point), et surtout **acronymes de toute combinaison de mots** (premières lettres → `as`, `am`, `ae`…). Tu n'as donc qu'à lister les **mots simples**, un par ligne :
+[`tools/genpass.sh`](../tools/genpass.sh) (cf §1.7) dérive automatiquement les **troncatures** et les **concaténations** (collé / tiret / point) à partir des mots de `words.txt`. En revanche il **ne fabrique pas** les acronymes/sigles : si tu veux `jp`, `csjp`, etc., **ajoute-les toi-même** comme mots dans `words.txt` (ou ajoute les initiales `c`, `s`, `j`, `p` comme mots, elles se combineront via les concaténations).
 
 ```
 anonymous
@@ -160,7 +160,7 @@ Pour un contrôle fin, [`tools/genpass.sh`](../tools/genpass.sh) combine **trois
 - `numbers.txt` — les **nombres** (ajoutés en **préfixe ou suffixe** — `cours2026` *et* `2026cours` — jamais au milieu d'un mot)
 - `specials.txt` — les **caractères spéciaux**
 
-À partir de `words.txt`, le script fabrique automatiquement : les **mots**, leurs **troncatures** (4–5 premières lettres), les **acronymes** (premières lettres de toute combinaison de mots → `jp`, `sjp`, `cjp`, `csjp`…), et les **concaténations** de 1 à `MAXWORDS` mots (collé / tiret / point). Le tout est ensuite décliné en `casse(min/MAJ/Cap) × 0..NUMMAX nombres × 0..SPECMAX spéciaux`, filtré sur la longueur.
+À partir de `words.txt`, le script fabrique : les **mots**, leurs **troncatures** (4–5 premières lettres) et les **concaténations** de 1 à `MAXWORDS` mots (collé / tiret / point) — y compris un **nombre inséré entre les mots** (`cours2026jean`). Il ne génère **pas** d'acronymes : liste tes sigles voulus directement dans `words.txt`. Le tout est ensuite décliné en `casse(min/MAJ/Cap) × 0..NUMMAX nombres (valeurs distinctes) × 0..SPECMAX spéciaux`, filtré sur la longueur.
 
 Les 3 listes sont lues dans le **dossier de données** : 1er argument, sinon dossier courant.
 

@@ -37,21 +37,9 @@ awk -v MAXWORDS="$MAXWORDS" '
 { for(i=1;i<=NF;i++) G[++M]=$i }                 # séquence globale de mots
 END{
   # mots simples + troncatures (4 et 5 premières lettres)
+  # (pas de generation d acronymes : ajoute tes sigles voulus directement dans words.txt)
   for(i=1;i<=M;i++){ print G[i];
     if(length(G[i])>=5){ print substr(G[i],1,4); print substr(G[i],1,5) } }
-  # acronymes = premières lettres. Pour M<=14 : tous les sous-ensembles ordonnés
-  # (donne jp, cjp, csjp…) ; sinon repli sur les runs de mots consécutifs.
-  if(M<=14){
-    lim=2^M
-    for(mask=1; mask<lim; mask++){ a=""; cnt=0
-      for(b=1;b<=M;b++) if(int(mask/2^(b-1))%2==1){ a=a substr(G[b],1,1); cnt++ }
-      if(cnt>=2 && cnt<=6) print a
-    }
-  } else {
-    cap=(M<8?M:8)
-    for(len=2;len<=cap;len++) for(s=1;s+len-1<=M;s++){
-      a=""; for(k=0;k<len;k++) a=a substr(G[s+k],1,1); print a }
-  }
   # concaténations ordonnées de mots DISTINCTS, longueur 2..MAXWORDS (+ séparateurs)
   if(MAXWORDS>=2) for(i=1;i<=M;i++) for(j=1;j<=M;j++){ if(i==j) continue;
     print G[i] G[j]; print G[i]"-"G[j]; print G[i]"."G[j];
