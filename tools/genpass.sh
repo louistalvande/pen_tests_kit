@@ -72,50 +72,39 @@ gen() {
   BEGIN{
     while((getline x < "numbers.txt")>0) if(x!="") NUM[++nn]=x
     while((getline x < "specials.txt")>0) if(x!="") SP[++ns]=x
-    # combos de nombres : index 0 = "" ; simples ; paires (NUMMAX>=2) ; triplets (NUMMAX>=3)
-    NC[nc++]="";
-    if(NUMMAX>=1) for(i=1;i<=nn;i++) NC[nc++]=NUM[i]
-    if(NUMMAX>=2) for(i=1;i<=nn;i++) for(j=1;j<=nn;j++) NC[nc++]=NUM[i] NUM[j]
-    if(NUMMAX>=3) for(i=1;i<=nn;i++) for(j=1;j<=nn;j++) for(k=1;k<=nn;k++) NC[nc++]=NUM[i] NUM[j] NUM[k]
-    # combos de spéciaux
-    SCn[sc++]="";
-    if(SPECMAX>=1) for(i=1;i<=ns;i++) SCn[sc++]=SP[i]
-    if(SPECMAX>=2){ for(i=1;i<=ns;i++) for(j=1;j<=ns;j++) SCn[sc++]=SP[i] SP[j] }
+    # combos de nombres AVEC leur taille : index 0 = "" (taille 0)
+    NCMB[0]=""; NSZ[0]=0; nc=1
+    if(NUMMAX>=1) for(i=1;i<=nn;i++){ NCMB[nc]=NUM[i]; NSZ[nc]=1; nc++ }
+    if(NUMMAX>=2) for(i=1;i<=nn;i++) for(j=1;j<=nn;j++){ NCMB[nc]=NUM[i] NUM[j]; NSZ[nc]=2; nc++ }
+    if(NUMMAX>=3) for(i=1;i<=nn;i++) for(j=1;j<=nn;j++) for(k=1;k<=nn;k++){ NCMB[nc]=NUM[i] NUM[j] NUM[k]; NSZ[nc]=3; nc++ }
   }
+  # Placement : [nombres prefixe] [coeur] [nombres suffixe] (total nombres <= NUMMAX) ;
+  # le special est insere a n importe quelle jointure (debut, entre segments, fin).
+  # Ex. couvert : 20262027-JP2 = pre 20262027, coeur JP, suf 2, special entre pre et coeur.
   {
     w=$0
     CF[1]=tolower(w); CF[2]=toupper(w); CF[3]=toupper(substr(w,1,1)) substr(w,2)
-    for(ci=1;ci<=3;ci++){ b=CF[ci]
-      for(ni=0;ni<nc;ni++){ n=NC[ni]
-        for(si=0;si<sc;si++){ s=SCn[si]
-          emit(b n s)                     # mot + nombre + spécial   (cours2026!)
-          if(s!="") emit(s b n)           # spécial + mot + nombre   (!cours2026)
-          if(n!="") emit(n b s)           # nombre + mot + spécial   (2026cours!)
-          if(n!="" && s!=""){
-            emit(s n b)                   # spécial + nombre + mot   (!2026cours)
-            emit(n s b)                   # nombre + spécial + mot   (2026!cours)
-            emit(b s n)                   # mot + spécial + nombre   (cours!2026)
+    for(ci=1;ci<=3;ci++){ core=CF[ci]
+      for(a=0;a<nc;a++){ pre=NCMB[a]
+        for(bb=0;bb<nc;bb++){ suf=NCMB[bb]
+          if(NSZ[a]+NSZ[bb] > NUMMAX) continue
+          m=0
+          if(pre!="") SEG[++m]=pre
+          SEG[++m]=core
+          if(suf!="") SEG[++m]=suf
+          # sans spécial
+          t=""; for(z=1;z<=m;z++) t=t SEG[z]; emit(t)
+          # un spécial inséré à une jointure (g=0 début .. g=m fin)
+          if(SPECMAX>=1) for(g=0;g<=m;g++) for(k=1;k<=ns;k++){
+            t=""
+            for(z=1;z<=m;z++){ if(z-1==g) t=t SP[k]; t=t SEG[z] }
+            if(g==m) t=t SP[k]
+            emit(t)
           }
-        }
-        # un spécial (éventuellement différent) à CHAQUE bout — besoin de SPECMAX>=2
-        if(SPECMAX>=2) for(p=1;p<=ns;p++) for(q=1;q<=ns;q++){
-          emit(SP[p] b SP[q])             # !cours@
-          if(n!=""){
-            emit(SP[p] b n SP[q])         # !cours2026@
-            emit(SP[p] n b SP[q])         # !2026cours@
+          # deux spéciaux : un au tout début ET un à la toute fin (besoin SPECMAX>=2)
+          if(SPECMAX>=2){ core2=""; for(z=1;z<=m;z++) core2=core2 SEG[z]
+            for(p=1;p<=ns;p++) for(q=1;q<=ns;q++) emit(SP[p] core2 SP[q])
           }
-        }
-      }
-      # nombres répartis AVANT et APRÈS le mot (total <= NUMMAX) — besoin de NUMMAX>=2
-      if(NUMMAX>=2) for(p=1;p<=nn;p++) for(q=1;q<=nn;q++){
-        emit(NUM[p] b NUM[q])             # 1 avant / 1 après : 2026cours27
-        if(SPECMAX>=1) for(k=1;k<=ns;k++){
-          emit(NUM[p] b NUM[q] SP[k])     # 2026cours27!
-          emit(SP[k] NUM[p] b NUM[q])     # !2026cours27
-        }
-        if(NUMMAX>=3) for(r=1;r<=nn;r++){
-          emit(NUM[p] b NUM[q] NUM[r])    # 1 avant / 2 après : 2026cours20272027
-          emit(NUM[p] NUM[q] b NUM[r])    # 2 avant / 1 après : 20262027cours2027
         }
       }
     }
