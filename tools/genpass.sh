@@ -34,6 +34,7 @@ done
 #    combinaisons de mots : jp, sjp, csjp, cjp…) + concaténations de 1..MAXWORDS mots.
 #    Les lignes multi-mots de words.txt sont éclatées en mots individuels.
 awk -v MAXWORDS="$MAXWORDS" '
+function cap(s){ return toupper(substr(s,1,1)) substr(s,2) }   # Francetv -> France
 { for(i=1;i<=NF;i++) G[++M]=$i }                 # séquence globale de mots
 END{
   # mots simples + troncatures (4 et 5 premières lettres)
@@ -41,10 +42,13 @@ END{
   for(i=1;i<=M;i++){ print G[i];
     if(length(G[i])>=5){ print substr(G[i],1,4); print substr(G[i],1,5) } }
   # concaténations ordonnées de mots DISTINCTS, longueur 2..MAXWORDS (+ séparateurs)
+  # + variante CamelCase par mot (FranceTv) qui sera conservée par la casse "telle quelle"
   if(MAXWORDS>=2) for(i=1;i<=M;i++) for(j=1;j<=M;j++){ if(i==j) continue;
     print G[i] G[j]; print G[i]"-"G[j]; print G[i]"."G[j];
+    print cap(G[i]) cap(G[j]);
     if(MAXWORDS>=3) for(k=1;k<=M;k++){ if(k==i||k==j) continue;
-      print G[i] G[j] G[k]; print G[i]"-"G[j]"-"G[k]; print G[i]"."G[j]"."G[k]; }
+      print G[i] G[j] G[k]; print G[i]"-"G[j]"-"G[k]; print G[i]"."G[j]"."G[k];
+      print cap(G[i]) cap(G[j]) cap(G[k]); }
   }
 }' words.txt | { grep -v ' ' || true; } | sed '/^[[:space:]]*$/d' | sort -u > .base.txt
 NB=$(wc -l < .base.txt)
@@ -95,8 +99,8 @@ gen() {   # $1 = fichier base ; $2 = NUMMAX effectif pour cette passe
   # Ex. couvert : 20262027-JP2 = pre 20262027, coeur JP, suf 2, special entre pre et coeur.
   {
     w=$0
-    CF[1]=tolower(w); CF[2]=toupper(w); CF[3]=toupper(substr(w,1,1)) substr(w,2)
-    for(ci=1;ci<=3;ci++){ core=CF[ci]
+    CF[1]=tolower(w); CF[2]=toupper(w); CF[3]=toupper(substr(w,1,1)) substr(w,2); CF[4]=w
+    for(ci=1;ci<=4;ci++){ core=CF[ci]   # 4 = telle quelle (conserve le CamelCase FranceTv)
       place(core, "", "")                                   # aucun nombre
       if(NUMMAX>=1) for(i=1;i<=nn;i++){ place(core, NUM[i], ""); place(core, "", NUM[i]) }   # 1 nombre
       if(NUMMAX>=2) for(i=1;i<=nn;i++) for(j=1;j<=nn;j++){   # 2 nombres DISTINCTS (i!=j)
