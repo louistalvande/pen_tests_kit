@@ -61,9 +61,25 @@ END{
 }' words.txt | { grep -v ' ' || true; } | sed '/^[[:space:]]*$/d' | sort -u > .base.txt
 NB=$(wc -l < .base.txt)
 
+# 2bis) base "nombre ENTRE les mots" (cours2026jean) — traitée ensuite SANS nombre ajouté,
+#       pour ne pas recréer de doublon de nombre. Seulement si MAXWORDS>=2.
+rm -f .base-mid.txt
+if [[ "$MAXWORDS" -ge 2 ]]; then
+  awk -v MAXWORDS="$MAXWORDS" '
+  BEGIN{ while((getline x<"numbers.txt")>0) if(x ~ /^[0-9]+$/ && !(x in s)){ s[x]=1; NB[++bn]=x } }
+  { for(i=1;i<=NF;i++) G[++M]=$i }
+  END{
+    for(i=1;i<=M;i++) for(j=1;j<=M;j++){ if(i==j) continue
+      for(t=1;t<=bn;t++){ print G[i] NB[t] G[j]; print G[i]"-"NB[t]"-"G[j]; print G[i]"."NB[t]"."G[j] }
+      if(MAXWORDS>=3) for(k=1;k<=M;k++){ if(k==i||k==j) continue
+        for(t=1;t<=bn;t++){ print G[i] NB[t] G[j] G[k]; print G[i] G[j] NB[t] G[k] } }
+    }
+  }' words.txt | { grep -v ' ' || true; } | sed '/^[[:space:]]*$/d' | sort -u > .base-mid.txt
+fi
+
 # 3) génération (awk) : casse x (0..NUMMAX nombres) x (0..SPECMAX spéciaux), suffixe + préfixe-spécial
-gen() {
-  awk -v NUMMAX="$NUMMAX" -v SPECMAX="$SPECMAX" -v MINLEN="$MINLEN" -v MAXLEN="$MAXLEN" -v COUNT="$COUNT" '
+gen() {   # $1 = fichier base ; $2 = NUMMAX effectif pour cette passe
+  awk -v NUMMAX="$2" -v SPECMAX="$SPECMAX" -v MINLEN="$MINLEN" -v MAXLEN="$MAXLEN" -v COUNT="$COUNT" '
   function emit(s,  L){ L=length(s); if(L>=MINLEN && L<=MAXLEN){ if(COUNT) c++; else print s } }
   # place le coeur avec nombres en prefixe/suffixe + 1 special insere a toute jointure
   function place(core, pre, suf,   SEG, m, z, t, g, k, p, q, core2){
@@ -94,7 +110,7 @@ gen() {
     CF[1]=tolower(w); CF[2]=toupper(w); CF[3]=toupper(substr(w,1,1)) substr(w,2)
     for(ci=1;ci<=3;ci++){ core=CF[ci]
       place(core, "", "")                                   # aucun nombre
-      for(i=1;i<=nn;i++){ place(core, NUM[i], ""); place(core, "", NUM[i]) }   # 1 nombre
+      if(NUMMAX>=1) for(i=1;i<=nn;i++){ place(core, NUM[i], ""); place(core, "", NUM[i]) }   # 1 nombre
       if(NUMMAX>=2) for(i=1;i<=nn;i++) for(j=1;j<=nn;j++){   # 2 nombres DISTINCTS (i!=j)
         if(i==j) continue
         place(core, "",            NUM[i] NUM[j])
@@ -111,18 +127,20 @@ gen() {
     }
   }
   END{ if(COUNT) printf "%d\n", c }
-  ' .base.txt
+  ' "$1"
 }
 
 if [[ "$COUNT" == "1" ]]; then
-  echo "base (mots$([[ $MAXWORDS -ge 2 ]] && echo '+paires')) : $NB"
-  n=$(gen)
+  echo "base (mots) : $NB$([[ -f .base-mid.txt ]] && echo " | base nombre-entre-mots : $(wc -l < .base-mid.txt)")"
+  n1=$(gen .base.txt "$NUMMAX")
+  n2=0; [[ -f .base-mid.txt ]] && n2=$(gen .base-mid.txt 0)   # passe "entre les mots" : AUCUN nombre ajouté
+  n=$((n1 + n2))
   printf "ESTIMATION (MAXWORDS=%s NUMMAX=%s SPECMAX=%s) : ~%d lignes, ~%d Mo\n" \
     "$MAXWORDS" "$NUMMAX" "$SPECMAX" "$n" "$((n*22/1000000))"
-  rm -f .base.txt
+  rm -f .base.txt .base-mid.txt
 else
   echo "[*] base : $NB mots | NUMMAX=$NUMMAX SPECMAX=$SPECMAX MAXWORDS=$MAXWORDS"
-  gen | sort -u > "$OUT"
-  rm -f .base.txt
+  { gen .base.txt "$NUMMAX"; [[ -f .base-mid.txt ]] && gen .base-mid.txt 0; } | sort -u > "$OUT"
+  rm -f .base.txt .base-mid.txt
   echo "[*] $OUT : $(wc -l < "$OUT") mots de passe (${MINLEN}–${MAXLEN} car.)"
 fi
